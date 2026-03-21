@@ -19,9 +19,12 @@ Full-stack service operations app: public booking, customer tracking and invoice
 
    Set:
 
-   - `DATABASE_URL` — Postgres connection string
+   - `DATABASE_URL` — Postgres connection string (for [Neon](https://neon.tech), use the **pooled** / pooler host)
+   - `DIRECT_URL` — Same DB over a **direct** (non-pooler) connection. For local Postgres, copy the same value as `DATABASE_URL`. For Neon, use the **unpooled** connection string (required so `prisma migrate` works with PgBouncer). See [Neon + Prisma](https://neon.tech/docs/guides/prisma).
    - `AUTH_SECRET` — e.g. `openssl rand -base64 32`
    - `AUTH_URL` — `http://localhost:3000` locally; your production URL on Vercel (used for password-reset links)
+
+   **Security:** Never commit real passwords. Add `.env` / `.env.local` only on your machine and in Vercel **Environment Variables**. If a connection string was exposed, rotate the password in the Neon dashboard.
 
 2. **Database**
 
@@ -72,6 +75,8 @@ Also: `hassan.malik@servenow.demo`, `sara.khan@servenow.demo`
 
 ## Deploy (Vercel)
 
-Set `DATABASE_URL`, `AUTH_SECRET`, and `AUTH_URL`. Build: `npm run build`.
+In the Vercel project, set `DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET`, and `AUTH_URL` (your production site URL). Build: `npm run build`.
+
+For Neon, paste the pooler URL into `DATABASE_URL` and the direct URL into `DIRECT_URL` (same names as in `.env.example`).
 
 Password reset emails are not sent by default. In **development**, `POST /api/auth/forgot-password` returns `resetUrl` in the JSON for testing. In **production**, configure email or integrate your provider using the same token fields on `User`.
