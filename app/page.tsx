@@ -59,12 +59,23 @@ export default async function HomePage() {
             <div className="mb-8 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
               <p className="font-semibold">Database not connected</p>
               <p className="mt-1 text-amber-900/90">
-                Set <code className="rounded bg-amber-100 px-1">DATABASE_URL</code> and{" "}
-                <code className="rounded bg-amber-100 px-1">DIRECT_URL</code> in <code className="rounded bg-amber-100 px-1">.env</code>{" "}
-                (e.g. Neon), then run{" "}
-                <code className="rounded bg-amber-100 px-1">npx prisma migrate deploy</code> and{" "}
-                <code className="rounded bg-amber-100 px-1">npm run db:seed</code>. Or start Postgres on{" "}
-                <code className="rounded bg-amber-100 px-1">localhost:5432</code>.
+                The app could not load data from Postgres (wrong URL, missing env vars, or migrations not applied).
+                {process.env.VERCEL ? (
+                  <>
+                    {" "}
+                    On <strong>Vercel</strong>, set <code className="rounded bg-amber-100 px-1">DATABASE_URL</code>{" "}
+                    (pooled) and <code className="rounded bg-amber-100 px-1">DATABASE_URL_UNPOOLED</code> (direct) in{" "}
+                    <strong>Project → Settings → Environment Variables</strong> for Production, then redeploy. Use the
+                    same values Neon shows — not <code className="rounded bg-amber-100 px-1">localhost</code>.
+                  </>
+                ) : (
+                  <>
+                    {" "}
+                    Locally, set those in <code className="rounded bg-amber-100 px-1">.env</code> or start Postgres.
+                  </>
+                )}{" "}
+                Then run <code className="rounded bg-amber-100 px-1">npx prisma migrate deploy</code> against that
+                database (and <code className="rounded bg-amber-100 px-1">npm run db:seed</code> if you want demo data).
               </p>
             </div>
           )}

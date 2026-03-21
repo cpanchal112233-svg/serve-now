@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { PageShell } from "@/components/layout/PageShell";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -36,12 +34,11 @@ export default function SignupPage() {
       redirect: false,
     });
     setLoading(false);
-    if (sign?.error) {
+    if (sign?.error || !sign?.ok) {
       setError("Account created but sign-in failed. Try logging in.");
       return;
     }
-    router.push("/account/dashboard");
-    router.refresh();
+    window.location.assign("/account/dashboard");
   }
 
   return (

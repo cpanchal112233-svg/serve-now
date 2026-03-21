@@ -9,11 +9,22 @@ import type { NextRequest } from "next/server";
 export async function middleware(req: NextRequest) {
   const secureCookie = req.nextUrl.protocol === "https:";
 
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET,
-    secureCookie,
-  });
+  let token: Awaited<ReturnType<typeof getToken>>;
+  try {
+    token = await getToken({
+      req,
+      secret: process.env.AUTH_SECRET,
+      secureCookie,
+    });
+  } catch {
+    const path = req.nextUrl.pathname;
+    if (path.startsWith("/admin") || path.startsWith("/technician") || path.startsWith("/account")) {
+      const url = new URL("/login", req.url);
+      url.searchParams.set("error", "Configuration");
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
 
   const path = req.nextUrl.pathname;
   const role = token?.role as string | undefined;

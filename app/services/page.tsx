@@ -18,11 +18,22 @@ export default async function ServicesPage() {
         {dbUnavailable && (
           <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
             <p className="font-semibold">Database not connected</p>
-            <p className="mt-1">
-              Update <code className="rounded bg-amber-100 px-1">DATABASE_URL</code> and{" "}
-              <code className="rounded bg-amber-100 px-1">DIRECT_URL</code> in <code className="rounded bg-amber-100 px-1">.env</code>, run{" "}
-              <code className="rounded bg-amber-100 px-1">npx prisma migrate deploy</code> and{" "}
-              <code className="rounded bg-amber-100 px-1">npm run db:seed</code>.
+            <p className="mt-1 text-amber-900/90">
+              The app could not load services from Postgres.{" "}
+              {process.env.VERCEL ? (
+                <>
+                  Set <code className="rounded bg-amber-100 px-1">DATABASE_URL</code> and{" "}
+                  <code className="rounded bg-amber-100 px-1">DATABASE_URL_UNPOOLED</code> in Vercel Environment
+                  Variables (Neon connection strings), redeploy, then run{" "}
+                  <code className="rounded bg-amber-100 px-1">npx prisma migrate deploy</code> against Neon.
+                </>
+              ) : (
+                <>
+                  Set <code className="rounded bg-amber-100 px-1">DATABASE_URL</code> and{" "}
+                  <code className="rounded bg-amber-100 px-1">DATABASE_URL_UNPOOLED</code> in{" "}
+                  <code className="rounded bg-amber-100 px-1">.env</code> and run migrations.
+                </>
+              )}
             </p>
           </div>
         )}

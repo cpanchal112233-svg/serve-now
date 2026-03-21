@@ -6,10 +6,10 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  // Pooled URL (e.g. Neon `*-pooler.*`) for the app runtime
+  // Pooled URL (e.g. Neon `*-pooler.*`) for Prisma Client
   url       = env("DATABASE_URL")
-  // Direct URL (non-pooler) for migrations — required when `DATABASE_URL` uses PgBouncer/Neon pooler
-  directUrl = env("DIRECT_URL")
+  // Non-pooler URL for migrations (Neon + Vercel use `DATABASE_URL_UNPOOLED`)
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
 enum UserRole {
