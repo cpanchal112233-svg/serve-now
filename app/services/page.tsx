@@ -1,15 +1,12 @@
 import Link from "next/link";
 import { PageShell } from "@/components/layout/PageShell";
-import { prisma } from "@/lib/db";
+import { getActiveServices } from "@/lib/get-services";
 import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function ServicesPage() {
-  const services = await prisma.service.findMany({
-    where: { isActive: true },
-    orderBy: { name: "asc" },
-  });
+  const { services, dbUnavailable } = await getActiveServices();
 
   return (
     <PageShell>
@@ -18,6 +15,17 @@ export default async function ServicesPage() {
         <p className="mt-2 max-w-2xl text-zinc-600">
           Choose a service to book. Duration and pricing are shown up front.
         </p>
+        {dbUnavailable && (
+          <div className="mt-6 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            <p className="font-semibold">Database not connected</p>
+            <p className="mt-1">
+              Update <code className="rounded bg-amber-100 px-1">DATABASE_URL</code> and{" "}
+              <code className="rounded bg-amber-100 px-1">DIRECT_URL</code> in <code className="rounded bg-amber-100 px-1">.env</code>, run{" "}
+              <code className="rounded bg-amber-100 px-1">npx prisma migrate deploy</code> and{" "}
+              <code className="rounded bg-amber-100 px-1">npm run db:seed</code>.
+            </p>
+          </div>
+        )}
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((s) => (
             <div

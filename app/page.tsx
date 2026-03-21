@@ -1,17 +1,13 @@
 import Link from "next/link";
 import { ServeNowHeroAnimation } from "@/components/hero/ServeNowHeroAnimation";
 import { PageShell } from "@/components/layout/PageShell";
-import { prisma } from "@/lib/db";
+import { getActiveServices } from "@/lib/get-services";
 import { formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const services = await prisma.service.findMany({
-    where: { isActive: true },
-    take: 4,
-    orderBy: { name: "asc" },
-  });
+  const { services, dbUnavailable } = await getActiveServices({ take: 4 });
 
   return (
     <PageShell>
@@ -59,6 +55,19 @@ export default async function HomePage() {
 
       <section className="border-b border-zinc-200 bg-zinc-50 py-16">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          {dbUnavailable && (
+            <div className="mb-8 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <p className="font-semibold">Database not connected</p>
+              <p className="mt-1 text-amber-900/90">
+                Set <code className="rounded bg-amber-100 px-1">DATABASE_URL</code> and{" "}
+                <code className="rounded bg-amber-100 px-1">DIRECT_URL</code> in <code className="rounded bg-amber-100 px-1">.env</code>{" "}
+                (e.g. Neon), then run{" "}
+                <code className="rounded bg-amber-100 px-1">npx prisma migrate deploy</code> and{" "}
+                <code className="rounded bg-amber-100 px-1">npm run db:seed</code>. Or start Postgres on{" "}
+                <code className="rounded bg-amber-100 px-1">localhost:5432</code>.
+              </p>
+            </div>
+          )}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-2xl font-bold text-zinc-900">Services preview</h2>
@@ -69,6 +78,9 @@ export default async function HomePage() {
             </Link>
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {services.length === 0 && !dbUnavailable && (
+              <p className="col-span-full text-sm text-zinc-600">No services yet.</p>
+            )}
             {services.map((s) => (
               <div
                 key={s.id}

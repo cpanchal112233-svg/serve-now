@@ -81,4 +81,8 @@ Route protection uses **Edge middleware** with `getToken` from Auth.js (JWT only
 
 For Neon, paste the pooler URL into `DATABASE_URL` and the direct URL into `DIRECT_URL` (same names as in `.env.example`).
 
+## Troubleshooting
+
+**“Can’t reach database server at `localhost:5432`”** — Postgres is not running locally, or `.env` still points at localhost. Use your hosted DB (e.g. Neon) in `DATABASE_URL` / `DIRECT_URL`, or start Postgres locally, then run `npx prisma migrate deploy` and `npm run db:seed`. The homepage shows a yellow notice if the DB is unreachable instead of a hard error.
+
 Password reset emails are not sent by default. In **development**, `POST /api/auth/forgot-password` returns `resetUrl` in the JSON for testing. In **production**, configure email or integrate your provider using the same token fields on `User`.
