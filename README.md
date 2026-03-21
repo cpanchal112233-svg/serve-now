@@ -19,7 +19,7 @@ Full-stack service operations app: public booking, customer tracking and invoice
 
    Set:
 
-   - `DATABASE_URL` — Postgres connection string (for [Neon](https://neon.tech), use the **pooled** / pooler host)
+   - `DATABASE_URL` — Postgres connection string (for [Neon](https://neon.tech), use the **pooled** / pooler host). The app appends `pgbouncer=true` for Neon pooler hosts so Prisma works with PgBouncer ([Prisma + Neon](https://www.prisma.io/docs/orm/overview/databases/neon)).
    - `DATABASE_URL_UNPOOLED` — Same database **without** the pooler (direct host). For local Postgres, use the **same** value as `DATABASE_URL`. For Neon, use the **unpooled** URL (required for `prisma migrate` with PgBouncer). See [Neon + Prisma](https://neon.tech/docs/guides/prisma).
    - `AUTH_SECRET` — e.g. `openssl rand -base64 32`
    - `AUTH_URL` — `http://localhost:3000` locally; your production URL on Vercel (used for password-reset links)
