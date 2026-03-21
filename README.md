@@ -77,6 +77,8 @@ Also: `hassan.malik@servenow.demo`, `sara.khan@servenow.demo`
 
 In the Vercel project, set `DATABASE_URL`, `DIRECT_URL`, `AUTH_SECRET`, and `AUTH_URL` (your production site URL). Build: `npm run build`.
 
+Route protection uses **Edge middleware** with `getToken` from Auth.js (JWT only) so the bundle stays under Vercel’s Edge size limit. Do **not** import `auth` from `lib/auth` in `middleware.ts` — that pulls Prisma and exceeds the limit ([Vercel Edge Function limits](https://vercel.com/docs/functions/runtimes/edge#limits)).
+
 For Neon, paste the pooler URL into `DATABASE_URL` and the direct URL into `DIRECT_URL` (same names as in `.env.example`).
 
 Password reset emails are not sent by default. In **development**, `POST /api/auth/forgot-password` returns `resetUrl` in the JSON for testing. In **production**, configure email or integrate your provider using the same token fields on `User`.

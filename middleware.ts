@@ -1,13 +1,25 @@
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
-  const session = req.auth;
+/**
+ * Edge-safe route protection: use JWT only (no Prisma / bcrypt).
+ * Importing `auth` from `lib/auth` pulls the full Auth.js + Prisma bundle (~1MB+), which exceeds Vercel Edge limits.
+ */
+export async function middleware(req: NextRequest) {
+  const secureCookie = req.nextUrl.protocol === "https:";
+
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+    secureCookie,
+  });
+
   const path = req.nextUrl.pathname;
-  const role = session?.user?.role;
+  const role = token?.role as string | undefined;
 
   if (path.startsWith("/admin")) {
-    if (!session) {
+    if (!token) {
       const url = new URL("/login", req.url);
       url.searchParams.set("callbackUrl", path);
       return NextResponse.redirect(url);
@@ -16,7 +28,7 @@ export default auth((req) => {
   }
 
   if (path.startsWith("/technician")) {
-    if (!session) {
+    if (!token) {
       const url = new URL("/login", req.url);
       url.searchParams.set("callbackUrl", path);
       return NextResponse.redirect(url);
@@ -25,7 +37,7 @@ export default auth((req) => {
   }
 
   if (path.startsWith("/account")) {
-    if (!session) {
+    if (!token) {
       const url = new URL("/login", req.url);
       url.searchParams.set("callbackUrl", path);
       return NextResponse.redirect(url);
@@ -34,7 +46,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/account/:path*", "/admin/:path*", "/technician/:path*"],
